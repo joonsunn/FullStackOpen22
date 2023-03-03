@@ -1,0 +1,41 @@
+{
+  "persons": [
+    {
+      "name": "Arto Hellas",
+      "number": "8976986986789",
+      "id": 1
+    },
+    {
+      "name": "Ada Lovelace",
+      "number": "39-44-5323523",
+      "id": 2
+    },
+    {
+      "name": "Dan Abramov",
+      "number": "12-43-234345",
+      "id": 3
+    },
+    {
+      "name": "Mary Poppendieck",
+      "number": "39-23-6423122",
+      "id": 4
+    },
+    {
+      "name": "fdsgdfgd",
+      "number": "1342345345",
+      "id": 6
+    }
+  ],
+  "dogs": [
+    {
+      "name": "doggy",
+      "species": "dog",
+      "id": 1
+    },
+    {
+      "name": "catty",
+      "species": "cat",
+      "id": 2
+    }
+  ]
+}
