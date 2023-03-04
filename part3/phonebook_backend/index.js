@@ -40,18 +40,31 @@ let persons = [
     },
 ]
 
-const personsNumber = persons.length
-const timeNow = new Date()
+// const personsNumber = Person.find().then(persons => {
+//     persons.length
+// })
+
 
 app.get('/', (request, response) => {
     response.send("<h1>hello world! You've reached the persons page.</h1>")
 })
 
 app.get('/info', (request, response) => {
-    response.send(
-        `<div>Phonebook has info for ${personsNumber} people</div>
-        <div>${timeNow}</div>`
-    )
+        
+    const doInfo = async () => {
+        
+        const personsList = await Person.find()
+        const personsNumber = await personsList.length
+        const timeNow = await new Date()
+
+        response.send(
+            `<div>Phonebook has info for ${personsNumber} people.</div>
+            <div>${new Date()}</div>`
+        )        
+    }
+
+    doInfo ()
+    
 })
 
 app.get('/api/persons', (request, response) => {
@@ -71,70 +84,95 @@ app.get('/api/test', (request, response) => {
     })
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
 
     Person.findById(request.params.id).then(person => {
-        response.json(person)
-    })
+        if (person) {
+            response.json(person)
+        } else {
+            response.status(404).end()
+        }
+    }).catch(error => next(error))
 
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
+    const id = request.params.id
 
-    const currentIds = [...persons.map(person => person.id)]
-    if (currentIds.includes(id)) {
-        persons = persons.filter(person => person.id != id)
-        response.send(`Person with id:${id} deleted`)
-    } else {
-        return(
-            response.status(400).json({error: `${id} not found`})
-        )
+    // const currentIds = [...persons.map(person => person.id)]
+    // if (currentIds.includes(id)) {
+    //     persons = persons.filter(person => person.id != id)
+    //     response.send(`Person with id:${id} deleted`)
+    // } else {
+    //     return(
+    //         response.status(400).json({error: `${id} not found`})
+    //     )
+    // }
+
+    const getIdList = async () => {
+        const personList = await Person.find()
+
+        const idList = await personList.map(person => person.id)
+
+        return idList
     }
 
-    
+    const doDelete = async () => {
+        const idList = await getIdList()
+
+        if (idList.includes(id)) {
+            Person.findByIdAndDelete(id ,(err, docs) => {
+                console.log(docs)
+                response.status(200).end()
+            })
+        } else {
+            response.status(400).json({error: `id:${id} not found`}).end()
+        }
+    }
+
+    doDelete() 
 })
 
-const generateRandomInteger = () => {
-    const randNum = Math.floor(Math.random() * 100000)
-    return(randNum)
-}
+// const generateRandomInteger = () => {
+//     const randNum = Math.floor(Math.random() * 100000)
+//     return(randNum)
+// }
 
-app.get('/api/randnum', (request, response) => {
-    // response.send(`${generateId()}`)
+// app.get('/api/randnum', (request, response) => {
+//     // response.send(`${generateId()}`)
 
-    const currentIds = [...persons.map(person => person.id)]
+//     const currentIds = [...persons.map(person => person.id)]
 
-    let notUniqueId = true
-    let newId = null
+//     let notUniqueId = true
+//     let newId = null
 
-    while (notUniqueId) {
-        newId = generateRandomInteger()
+//     while (notUniqueId) {
+//         newId = generateRandomInteger()
 
-        if (!currentIds.includes(newId)) {
-            notUniqueId = false
+//         if (!currentIds.includes(newId)) {
+//             notUniqueId = false
             
-        }
-    }
-    response.send(`newId: ${newId}`)
-    console.log(`new unique id:`, newId)
-})
+//         }
+//     }
+//     response.send(`newId: ${newId}`)
+//     console.log(`new unique id:`, newId)
+// })
 
-const generateUniqueId = () => {
-    const currentIds = [...persons.map(person => person.id)]
+// const generateUniqueId = () => {
+//     const currentIds = [...persons.map(person => person.id)]
 
-    let notUniqueId = true
-    let newId = null
+//     let notUniqueId = true
+//     let newId = null
 
-    while (notUniqueId) {
-        newId = generateRandomInteger()
+//     while (notUniqueId) {
+//         newId = generateRandomInteger()
 
-        if (!currentIds.includes(newId)) {
-            notUniqueId = false
-            return(newId)
-        }
-    }
-}
+//         if (!currentIds.includes(newId)) {
+//             notUniqueId = false
+//             return(newId)
+//         }
+//     }
+// }
 
 // const checkNameExists = async (nameToBeChecked) => {
 //     const nameExists = await Person.find({ name: { $regex: nameToBeChecked, $options: 'i' } }).then(person => person).length == 1 ? true: false
@@ -167,13 +205,13 @@ app.post('/api/persons', (request, response) => {
         const nameExists = personArray.length == 1 ? true: false
         
         if (!body.name) {
-            console.log('reach no name loop')
+            // console.log('reach no name loop')
             return (
                 response.status(400).json({error: "name missing"})
             )
         } 
         else if (nameExists) {
-            console.log('reach find name loop')
+            // console.log('reach find name loop')
             
             // const personList = await Person.find({ name: { $regex: nameToBeChecked, $options: 'i' } })
             // const personObject = personList[0]
@@ -201,8 +239,8 @@ app.post('/api/persons', (request, response) => {
 
         } 
         else if (!nameExists) {
-            console.log('reach add new name loop')
-            console.log(`nameExists: ${nameExists}`)
+            // console.log('reach add new name loop')
+            // console.log(`nameExists: ${nameExists}`)
             const person = new Person({
                 name: body.name,
                 number: body.number
@@ -228,12 +266,12 @@ app.put('/api/persons/:id', (request, response) => {
         const personID = personObject._id
 
         Person.findByIdAndUpdate(personID, {name:body.name, number: body.number}, (err, docs) => {
-            console.log('reach update loop')
+            // console.log('reach update loop')
             if (err) {
                 console.log(err)
                 response.status(400).json(err)
             } else if (!err) {
-                console.log("Updated user:", docs)
+                // console.log("Updated user:", docs)
                 response.json(docs)
             }
         })
@@ -243,6 +281,17 @@ app.put('/api/persons/:id', (request, response) => {
     doPut()
 
 })
+
+const errorHandler = (error, request, response, next) => {
+    // console.log(error.message)
+    if (error.name == "CastError") {
+        response.status(400).send({error: "Malformatted id"})
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
