@@ -53,17 +53,16 @@ app.get('/info', (request, response) => {
         
     const doInfo = async () => {
         
-        const personsList = await Person.find()
-        const personsNumber = await personsList.length
+        const personsNumber = await Person.find().then(personsList => personsList.length)
         const timeNow = await new Date()
 
-        response.send(
+        return (response.send(
             `<div>Phonebook has info for ${personsNumber} people.</div>
-            <div>${new Date()}</div>`
-        )        
+            <div>${timeNow}</div>`
+        ))
     }
 
-    doInfo ()
+    doInfo()
     
 })
 
