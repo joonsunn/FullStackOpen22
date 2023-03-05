@@ -12,6 +12,8 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 app.use(cors())
 app.use(express.static('build'))
 
+
+
 let persons = [
     { 
       "id": 1,
@@ -46,7 +48,7 @@ let persons = [
 
 
 app.get('/', (request, response) => {
-    response.send("<h1>hello world! You've reached the persons page.</h1>")
+    return response.send("<h1>hello world! You've reached the persons page.</h1>")
 })
 
 app.get('/info', (request, response) => {
@@ -69,7 +71,7 @@ app.get('/info', (request, response) => {
 app.get('/api/persons', (request, response) => {
 
     Person.find({}).then(persons => {
-        response.json(persons)
+        return response.json(persons)
     })
 
 })
@@ -79,7 +81,7 @@ const name1 = 'i'
 app.get('/api/test', (request, response) => {
     Person.find({ name: { $regex: name1, $options: 'i' } }).then(person => {
         console.log(person.length)
-        response.json(person)
+        return response.json(person)
     })
 })
 
@@ -87,9 +89,9 @@ app.get('/api/persons/:id', (request, response, next) => {
 
     Person.findById(request.params.id).then(person => {
         if (person) {
-            response.json(person)
+            return response.json(person)
         } else {
-            response.status(404).end()
+            return response.status(404).end()
         }
     }).catch(error => next(error))
 
@@ -122,10 +124,10 @@ app.delete('/api/persons/:id', (request, response) => {
         if (idList.includes(id)) {
             Person.findByIdAndDelete(id ,(err, docs) => {
                 console.log(docs)
-                response.status(200).end()
+                return response.status(200).end()
             })
         } else {
-            response.status(400).json({error: `id:${id} not found`}).end()
+            return response.status(400).json({error: `id:${id} not found`}).end()
         }
     }
 
@@ -191,7 +193,7 @@ app.delete('/api/persons/:id', (request, response) => {
 //     })
 // }
 
-app.post('/api/persons', (request, response) => {   
+app.post('/api/persons', (request, response, next) => {   
     
 
     // console.log(body.number)
@@ -246,8 +248,8 @@ app.post('/api/persons', (request, response) => {
             })
     
             person.save().then(savedPerson => {
-                response.json(savedPerson)
-            })
+                return response.json(savedPerson)
+            }).catch(error => next(error))
         }
     }
     
@@ -255,7 +257,7 @@ app.post('/api/persons', (request, response) => {
     
 })
 
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
 
     const doPut = async () => {
         const body = await request.body
@@ -264,16 +266,11 @@ app.put('/api/persons/:id', (request, response) => {
         // console.log(personObject)
         const personID = personObject._id
 
-        Person.findByIdAndUpdate(personID, {name:body.name, number: body.number}, (err, docs) => {
-            // console.log('reach update loop')
-            if (err) {
-                console.log(err)
-                response.status(400).json(err)
-            } else if (!err) {
-                // console.log("Updated user:", docs)
-                response.json(docs)
-            }
+        Person.findByIdAndUpdate(personID, {name:body.name, number: body.number}, {new: true, runValidators: true, context: 'query'})
+        .then(updatedPerson => {
+            return response.json(updatedPerson)
         })
+        .catch(error => next(error))
 
     }
 
@@ -282,9 +279,11 @@ app.put('/api/persons/:id', (request, response) => {
 })
 
 const errorHandler = (error, request, response, next) => {
-    // console.log(error.message)
-    if (error.name == "CastError") {
-        response.status(400).send({error: "Malformatted id"})
+    console.log(error.message)
+    if (error.name === 'CastError') {
+        return response.status(400).send({error: "malfomatted id"})
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({error: error.message})
     }
 
     next(error)
