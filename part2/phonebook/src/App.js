@@ -123,6 +123,14 @@ const App = () => {
             setErrorMessage(null)
             setErrorType(null)
           }, 5000)
+        }).catch(error => {
+          console.log(error)
+          setErrorMessage(`${error.response.data.error}`)
+          setErrorType(true)
+          setTimeout( () => {
+            setErrorMessage(null)
+            setErrorType(null)
+          }, 5000)
         })
       }
     }
