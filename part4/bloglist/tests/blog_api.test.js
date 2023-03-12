@@ -94,6 +94,33 @@ describe('blog api tests', () => {
 
 	})
 
+	test('deleting a blog item', async () => {
+		const response1 = await api
+			.get('/api/blogs')
+		const blogToDelete = response1.body[0]
+		const idToDelete = blogToDelete.id
+
+		const response2 = await api.delete(`/api/blogs/${idToDelete}`)
+		expect(response2.status).toBe(204)
+
+		const blogListAtEnd = await helper.blogsInDb()
+		expect(blogListAtEnd).toHaveLength(helper.initialBlogs.length -1)
+	})
+
+	test('updating "likes" of a blog item', async () => {
+		const response1 = await api.get('/api/blogs')
+		const blogList = response1.body
+		const blogSelected = blogList[3]
+
+		const updatedBlogEntry = { ...blogSelected, likes:15 }
+
+		const response2 = await api.put(`/api/blogs/${blogSelected.id}`).send(updatedBlogEntry)
+
+		expect(response2.body.likes).toBe(15)
+		expect(response2.body.likes).not.toBe(blogSelected.likes)
+
+	})
+
 })
 
 afterAll(async () => {
