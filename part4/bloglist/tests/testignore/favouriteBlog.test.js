@@ -1,4 +1,4 @@
-const { favouriteBlog } = require('../utils/list_helper')
+const { favouriteBlog } = require('../../utils/list_helper')
 
 const blogList1 = [
 	{

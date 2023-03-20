@@ -1,4 +1,4 @@
-const { mostLikes } = require('../utils/list_helper')
+const { mostLikes } = require('../../utils/list_helper')
 
 const blogList = [
 	{
