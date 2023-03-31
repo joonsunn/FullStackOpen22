@@ -108,7 +108,11 @@ const App = () => {
 			blogFormRef.current.toggleVisibility()
 
 			const savedBlog = await blogService.create(blogObject)
-			setBlogs(blogs.concat(savedBlog))
+			// console.log(savedBlog)
+			// setBlogs(blogs.concat(savedBlog))
+
+			const blogs = await blogService.getAll()
+			setBlogs(blogs)
 
 			promptMessage(`New blog entry "${blogObject.title}" saved!`, false)
 
@@ -144,7 +148,7 @@ const App = () => {
 
 	const loginForm = () => (
 		<div>
-			<Togglable buttonLabel = 'login'>
+			<Togglable buttonLabelBefore = 'login' buttonLabelAfter = 'cancel'>
 				<LoginForm
 					// username = {username}
 					// password = {password}
@@ -189,7 +193,7 @@ const App = () => {
 
 	const blogEntryForm = () => (
 		<div>
-			<Togglable buttonLabel = 'new blog' ref = {blogFormRef}>
+			<Togglable buttonLabelBefore = 'new blog' buttonLabelAfter = 'cancel' ref = {blogFormRef}>
 				<BlogForm
 					createBlog={handleBlogCreation}
 				></BlogForm>
