@@ -18,6 +18,7 @@ blogsRouter.get('/', async (request, response) => {
 	// })
 
 	const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
+	// blogs.sort((a, b) => b.likes - a.likes) //sorting from back-end side
 	return response.json(blogs)
 })
 
@@ -120,7 +121,9 @@ blogsRouter.put('/:id', [middleware.tokenExtractor, middleware.userExtractor], a
 		title: body.title,
 		author: body.author,
 		url: body.url,
-		likes: body.likes
+		likes: body.likes,
+		// id: body.id,
+		// user: user.id
 	}
 
 	// Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
@@ -134,6 +137,8 @@ blogsRouter.put('/:id', [middleware.tokenExtractor, middleware.userExtractor], a
 	if (originalBlogToBeUpdated.user.toString() === user.id.toString()) {
 		const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
 		response.json(updatedBlog)
+	} else {
+		return response.status(401).send({ error: 'Unauthorised action. Action aborted.' }).end()
 	}
 
 
