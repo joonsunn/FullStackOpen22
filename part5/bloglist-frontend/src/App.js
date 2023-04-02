@@ -107,7 +107,7 @@ const App = () => {
 		try {
 			blogFormRef.current.toggleVisibility()
 
-			const savedBlog = await blogService.create(blogObject)
+			await blogService.create(blogObject)
 			// console.log(savedBlog)
 			// setBlogs(blogs.concat(savedBlog))
 
@@ -121,6 +121,33 @@ const App = () => {
 			promptMessage('Unable to create blog entry', true)
 		}
 
+	}
+
+	const handleLike = async (blogObject) => {
+		try {
+			const savedBlog = await blogService.update(blogObject.id, blogObject)
+
+			const blogs = await blogService.getAll()
+			setBlogs(blogs)
+			promptMessage(`+ 1 like added to blog entry "${savedBlog.title}".`)
+
+		} catch (exception) {
+			promptMessage('Unable to add like', true)
+		}
+	}
+
+	const handleDelete = async (id) => {
+		try {
+			const blogToBeDeleted = await blogService.getOne(id)
+			if (window.confirm(`Are you sure you want to delete blog entry ${blogToBeDeleted.id} with title ${blogToBeDeleted.title}?`)) {
+				await blogService.remove(id)
+				promptMessage(`Successfully deleted blog entry ${blogToBeDeleted.title}`, false)
+				const blogs = await blogService.getAll()
+				setBlogs(blogs)
+			}
+		} catch (exception) {
+			promptMessage('Unable to delete blog entry', true)
+		}
 	}
 
 	// const loginForm = () => (
@@ -225,7 +252,8 @@ const App = () => {
 				<br></br>
 				{blogs
 					.filter(blog => blog.user !== JSON.stringify(user.id))
-					.map(filteredBlog => <Blog key={filteredBlog.id} blog={filteredBlog} />)
+					.sort((a, b) => b.likes - a.likes)	//sorting from front-end side
+					.map(filteredBlog => <Blog key={filteredBlog.id} blog={filteredBlog} handleLike = {handleLike} handleDelete = {handleDelete}/>)
 				}
 			</div>
 			}

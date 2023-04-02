@@ -1,24 +1,24 @@
+/* eslint-env node */
 module.exports = {
 	'env': {
 		'browser': true,
-		'es2021': true,
-		'node': true,
-		'jest': true,
+		'es6': true,
+		'jest/globals': true
 	},
-	'extends': 'eslint:recommended',
-	'overrides': [
+	'extends': [
+		'eslint:recommended',
+		'plugin:react/recommended'
 	],
-	// 'parserOptions': {
-	// 	'ecmaVersion': 'latest',
-	// 	'sourceType': 'module'
-	// },
 	'parserOptions': {
 		'ecmaFeatures': {
-			'jsx': true,
-			'modules': true
+			'jsx': true
 		},
+		'ecmaVersion': 2018,
 		'sourceType': 'module'
 	},
+	'plugins': [
+		'react', 'jest'
+	],
 	'rules': {
 		'indent': [
 			'error',
@@ -45,9 +45,13 @@ module.exports = {
 			'error', { 'before': true, 'after': true }
 		],
 		'no-console': 0,
-		'no-unused-vars': 'off',
+		'react/prop-types': 0,
+		'react/react-in-jsx-scope': 'off',
+		'react/no-unknown-property': ['error', { ignore: ['notiftype'] }]
 	},
-	'plugins': [
-		'html'
-	],
+	'settings': {
+		'react': {
+			'version': 'detect'
+		}
+	}
 }

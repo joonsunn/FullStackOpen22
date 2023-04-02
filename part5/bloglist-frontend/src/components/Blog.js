@@ -1,10 +1,8 @@
 import { useState } from 'react'
-import Togglable from './Togglable'
 
-
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleLike, handleDelete }) => {
 	const [visible, setVisible] = useState(false)
-	const hideWhenVisible = { display: visible? 'none' : '' }
+	// const hideWhenVisible = { display: visible? 'none' : '' }
 	const showWhenVisible = { display: visible? '' : 'none' }
 
 	const toggleVisibility = () => {
@@ -13,6 +11,18 @@ const Blog = ({ blog }) => {
 
 	const changeButtonText = (target) => {
 		target.innerText = target.innerText === 'show more' ? 'show less' : 'show more'
+	}
+
+	const addLike = () => {
+		handleLike({
+			// ...blog,
+			id: blog.id,
+			likes: blog.likes + 1
+		})
+	}
+
+	const performDelete = () => {
+		handleDelete(blog.id)
 	}
 
 	const blogStyle = {
@@ -25,16 +35,13 @@ const Blog = ({ blog }) => {
 	}
 
 	return (
-		<div style = {blogStyle}>
-			{/* {blog.title} {blog.author} <button onClick={({ target }) => {toggleVisibility(); target.innerHTML = target.innerHTML === 'show more' ? 'show less' : 'show more'}}>show more</button> */}
+		<div style = {blogStyle} id = {blog.id}>
 			{blog.title} {blog.author} <button onClick={({ target }) => {toggleVisibility(); changeButtonText(target)}}>show more</button>
-			{/* <button onClick={toggleVisibility} style = {showWhenVisible}>show less</button> */}
 			<div style = {showWhenVisible}>
-				{/* <ul> */}
 				<li>{blog.url}</li>
-				<li>{blog.likes} <button>like</button></li>
+				<li>{blog.likes} <button onClick={() => addLike()}>like 👍</button></li>
 				<li>{blog.user.name}</li>
-				{/* </ul> */}
+				<button onClick={() => performDelete()} style = {{ backgroundColor: 'pink' }}>Remove blog entry</button>
 			</div>
 		</div>
 	)
