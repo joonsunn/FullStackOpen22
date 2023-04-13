@@ -237,13 +237,13 @@ const App = () => {
 			<h1>Blog application</h1>
 			<Notification message = {errorMessage} realError = {errorType}></Notification>
 
-			{!user && <div><h2>Login to application</h2><div>{loginForm()}</div></div>}
+			{!user && <div><h2>Login to application</h2><div>{loginForm()} {blogs.map(blog => <Blog key={blog.id} blog={blog} handleLike = {() => {}} handleDelete = {() => {}} showDelete = {false}></Blog>)}</div></div>}
 			{user &&
 			<div>
 				<h2>blogs</h2>
 				<p>{user.name} logged in</p>
 				<div>
-					<button onClick = {() => handleLogout()}>logout</button>
+					<button id = 'logout' onClick = {() => handleLogout()}>logout</button>
 				</div>
 				<br></br>
 				<div>
@@ -253,7 +253,7 @@ const App = () => {
 				{blogs
 					.filter(blog => blog.user !== JSON.stringify(user.id))
 					.sort((a, b) => b.likes - a.likes)	//sorting from front-end side
-					.map(filteredBlog => <Blog key={filteredBlog.id} blog={filteredBlog} handleLike = {handleLike} handleDelete = {handleDelete}/>)
+					.map(filteredBlog => <Blog key={filteredBlog.id} blog={filteredBlog} handleLike = {handleLike} handleDelete = {handleDelete} showDelete={true}/>)
 				}
 			</div>
 			}

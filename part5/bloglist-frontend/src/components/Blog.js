@@ -1,9 +1,10 @@
 import { useState } from 'react'
 
-const Blog = ({ blog, handleLike, handleDelete }) => {
+const Blog = ({ blog, handleLike, handleDelete, showDelete }) => {
 	const [visible, setVisible] = useState(false)
 	// const hideWhenVisible = { display: visible? 'none' : '' }
 	const showWhenVisible = { display: visible? '' : 'none' }
+	// const showDeleteButton = { display: showDelete? '' : 'none' }
 
 	const toggleVisibility = () => {
 		setVisible(!visible)
@@ -35,13 +36,14 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
 	}
 
 	return (
-		<div style = {blogStyle} id = {blog.id}>
+		<div style = {blogStyle} id = {blog.id} className='blog'>
 			{blog.title} {blog.author} <button onClick={({ target }) => {toggleVisibility(); changeButtonText(target)}}>show more</button>
 			<div style = {showWhenVisible}>
 				<li>{blog.url}</li>
-				<li>{blog.likes} <button onClick={() => addLike()}>like 👍</button></li>
+				<li><span>{blog.likes}</span> <button onClick={() => addLike()}>like</button></li>
 				<li>{blog.user.name}</li>
-				<button onClick={() => performDelete()} style = {{ backgroundColor: 'pink' }}>Remove blog entry</button>
+				{/* <button onClick={() => performDelete()} style = {{ backgroundColor: 'pink', display: showDelete? '': 'none' }}>Remove blog entry</button> */}
+				{ showDelete? <button id = 'deleteButton' onClick={() => performDelete()} style = {{ backgroundColor: 'pink', display: showDelete? '': 'none' }}>Remove blog entry</button> : <div></div> }
 			</div>
 		</div>
 	)
