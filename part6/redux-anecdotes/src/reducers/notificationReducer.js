@@ -9,7 +9,7 @@ const notificationSlice = createSlice({
 	name: 'notification',
 	initialState: initialState,
 	reducers: {
-		setNotification(state, action) {
+		setNotificationStyle(state, action) {
 			const content = action.payload
 			const style = {
 				border: 'solid',
@@ -17,6 +17,7 @@ const notificationSlice = createSlice({
 				borderWidth: 1,
 				marginBottom: 10
 			  }
+			// console.log(`action: ${JSON.stringify(action2)}`)
 			return {
 				content,
 				style
@@ -28,5 +29,12 @@ const notificationSlice = createSlice({
 	}
 })
 
-export const { setNotification, resetNotification } = notificationSlice.actions
+export const { setNotificationStyle, resetNotification } = notificationSlice.actions
+export const setNotification = (content, time) => {
+	return async dispatch => {
+		// console.log(`content: ${content}, time: ${time}`)
+		dispatch(setNotificationStyle(content))
+		setTimeout(() => {dispatch(resetNotification())}, time)
+	}
+}
 export default notificationSlice.reducer
