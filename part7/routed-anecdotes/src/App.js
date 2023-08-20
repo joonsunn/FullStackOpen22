@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom'
 
-const Menu = ({ anecdotes, addNew }) => {
+const Menu = ({ anecdotes, addNew, setNotification, notification }) => {
   const padding = {
     paddingRight: 5
   }
@@ -12,9 +12,12 @@ const Menu = ({ anecdotes, addNew }) => {
 			<Link to='/create' style={padding}>create new</Link>
 			<Link to='/about' style={padding}>about</Link>
 		</div>
+		{notification && 
+			<Notification notification={notification}></Notification>
+		}
 		<Routes>
 			<Route path='/' element={<AnecdoteList anecdotes={anecdotes} ></AnecdoteList>}></Route>
-			<Route path='/create' element={<CreateNew addNew={addNew}></CreateNew>}></Route>
+			<Route path='/create' element={<CreateNew addNew={addNew} setNotification={setNotification}></CreateNew>}></Route>
 			<Route path='/about' element={<About></About>}></Route>
 			<Route path='/anecdotes/:id' element={<Anecdote anecdotes={anecdotes}></Anecdote>}></Route>
 		</Routes>
@@ -22,6 +25,11 @@ const Menu = ({ anecdotes, addNew }) => {
   )
 }
 
+const Notification = ({notification}) => {
+	return (
+		<div>a new anecdote {notification} created!</div>
+	)
+}
 
 const Anecdote = ({anecdotes}) => {
 	const id = useParams().id
@@ -82,6 +90,8 @@ const CreateNew = (props) => {
       info,
       votes: 0
     })
+	props.setNotification(content)
+	setTimeout(() => props.setNotification(''), 5000)
 	navigate('/')
   }
 
@@ -150,7 +160,8 @@ const App = () => {
   return (
     <div>
       <h1>Software anecdotes</h1>
-      <Menu anecdotes={anecdotes} addNew={addNew}/>
+	  {/* {notification || <Notification notification={notification}></Notification>} */}
+      <Menu anecdotes={anecdotes} addNew={addNew} setNotification={setNotification} notification={notification}/>
       {/* <AnecdoteList anecdotes={anecdotes} /> */}
       {/* <About /> */}
       {/* <CreateNew addNew={addNew} /> */}
