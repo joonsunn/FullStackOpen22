@@ -1,15 +1,38 @@
 import { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom'
 
-const Menu = () => {
+const Menu = ({ anecdotes, addNew }) => {
   const padding = {
     paddingRight: 5
   }
   return (
-    <div>
-      <a href='#' style={padding}>anecdotes</a>
-      <a href='#' style={padding}>create new</a>
-      <a href='#' style={padding}>about</a>
-    </div>
+    <Router>
+		<div>
+			<Link to='/' style={padding}>anecdotes</Link>
+			<Link to='/create' style={padding}>create new</Link>
+			<Link to='/about' style={padding}>about</Link>
+		</div>
+		<Routes>
+			<Route path='/' element={<AnecdoteList anecdotes={anecdotes} ></AnecdoteList>}></Route>
+			<Route path='/create' element={<CreateNew addNew={addNew}></CreateNew>}></Route>
+			<Route path='/about' element={<About></About>}></Route>
+			<Route path='/anecdotes/:id' element={<Anecdote anecdotes={anecdotes}></Anecdote>}></Route>
+		</Routes>
+	</Router>
+  )
+}
+
+
+const Anecdote = ({anecdotes}) => {
+	const id = useParams().id
+	const anecdote = anecdotes.find(anecdote => anecdote.id === Number(id))
+	
+	return (
+	<div>
+		<h2>{anecdote.content} by {anecdote.author}</h2>
+		<p>has {anecdote.votes} votes</p>
+		<p>for more info see <Link to={anecdote.info}>{anecdote.info}</Link></p>
+	</div>
   )
 }
 
@@ -17,7 +40,7 @@ const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote => <li key={anecdote.id}><Link to={`anecdotes/${anecdote.id}`}>{anecdote.content}</Link></li>)}
     </ul>
   </div>
 )
@@ -48,6 +71,7 @@ const CreateNew = (props) => {
   const [content, setContent] = useState('')
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
+  const navigate = useNavigate()
 
 
   const handleSubmit = (e) => {
@@ -58,6 +82,7 @@ const CreateNew = (props) => {
       info,
       votes: 0
     })
+	navigate('/')
   }
 
   return (
@@ -125,10 +150,10 @@ const App = () => {
   return (
     <div>
       <h1>Software anecdotes</h1>
-      <Menu />
-      <AnecdoteList anecdotes={anecdotes} />
-      <About />
-      <CreateNew addNew={addNew} />
+      <Menu anecdotes={anecdotes} addNew={addNew}/>
+      {/* <AnecdoteList anecdotes={anecdotes} /> */}
+      {/* <About /> */}
+      {/* <CreateNew addNew={addNew} /> */}
       <Footer />
     </div>
   )
